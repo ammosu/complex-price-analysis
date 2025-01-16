@@ -18,6 +18,8 @@ const PriceComparisonChart = () => {
   const [selectedComplex, setSelectedComplex] = useState('all');
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   // 處理排序
   const handleSort = (field) => {
@@ -2791,8 +2793,10 @@ const PriceComparisonChart = () => {
                 </tr>
               </thead>
               <tbody>
-                {getDetailedData.map((item, index) => (
-                  <tr key={index} className="border-b">
+                {getDetailedData
+                  .slice((currentPage - 1) * pageSize, currentPage * pageSize)
+                  .map((item, index) => (
+                  <tr key={index} className="border-b hover:bg-gray-50">
                     <td className="px-4 py-2">{item.time}</td>
                     <td className="px-4 py-2">{item.county}</td>
                     <td className="px-4 py-2">{item.complex_name}</td>
@@ -2806,6 +2810,66 @@ const PriceComparisonChart = () => {
               </tbody>
             </table>
           </div>
+          
+          {/* 分頁控制 */}
+          <div className="mt-4 flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-700">每頁顯示:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => {
+                  setPageSize(Number(e.target.value));
+                  setCurrentPage(1);  // 重置到第一頁
+                }}
+                className="border rounded px-2 py-1"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="text-sm text-gray-700">
+                筆，共 {getDetailedData.length} 筆資料
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage(1)}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {'<<'}
+              </button>
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {'<'}
+              </button>
+              
+              <span className="text-sm text-gray-700">
+                第 {currentPage} 頁，共 {Math.ceil(getDetailedData.length / pageSize)} 頁
+              </span>
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, Math.ceil(getDetailedData.length / pageSize)))}
+                disabled={currentPage === Math.ceil(getDetailedData.length / pageSize)}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {'>'}
+              </button>
+              <button
+                onClick={() => setCurrentPage(Math.ceil(getDetailedData.length / pageSize))}
+                disabled={currentPage === Math.ceil(getDetailedData.length / pageSize)}
+                className="px-3 py-1 border rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {'>>'}
+              </button>
+            </div>
+          </div>
+
           <div className="mt-4 p-4 bg-gray-100 rounded">
             <p>平均誤差率: {averageError}%</p>
           </div>
