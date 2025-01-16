@@ -2714,6 +2714,16 @@ const PriceComparisonChart = () => {
                     return (
                       <g key={`dot-${payload.time}`}>
                         <circle key={`circle-${payload.time}`} cx={cx} cy={cy} r={4} fill="#8884d8" />
+                        <text 
+                          key={`text-${payload.time}`}
+                          x={cx} 
+                          y={cy-10} 
+                          textAnchor="middle" 
+                          fill="#666"
+                          fontSize="12"
+                        >
+                          {payload.count}筆
+                        </text>
                       </g>
                     );
                   }}
