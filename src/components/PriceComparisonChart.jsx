@@ -2626,8 +2626,8 @@ const PriceComparisonChart = () => {
       return (
         <div className="bg-white p-4 border rounded shadow">
           <p className="font-bold">{`時間: ${label}`}</p>
-          <p className="text-[#8884d8]">{`實際房價: ${(payload[0].value/10000).toFixed(2)}萬`}</p>
-          <p className="text-[#82ca9d]">{`預測房價: ${(payload[1].value/10000).toFixed(2)}萬`}</p>
+          <p className="text-[#8884d8]">{`實際房價 (平均): ${(payload[0].value/10000).toFixed(2)}萬`}</p>
+          <p className="text-[#82ca9d]">{`預測房價 (平均): ${(payload[1].value/10000).toFixed(2)}萬`}</p>
           <p className="font-bold text-gray-600">{`資料筆數: ${dataPoint.count}筆`}</p>
         </div>
       );
@@ -2684,12 +2684,14 @@ const PriceComparisonChart = () => {
                   dataKey="time" 
                   angle={45} 
                   textAnchor="start" 
-                  height={60}
+                  height={80}  // 增加高度
+                  tick={{ fontSize: 12 }}
                 >
                   <Label 
                     value="月份 (資料筆數)" 
-                    offset={-25} 
                     position="insideBottom"
+                    offset={-1}
+                    style={{ textAnchor: 'middle' }}
                   />
                 </XAxis>
                 <YAxis 
@@ -2697,7 +2699,10 @@ const PriceComparisonChart = () => {
                   tickFormatter={(value) => `${(value/10000).toFixed(1)}萬`}
                 />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend />
+                <Legend 
+                  verticalAlign="top"  // 將圖例移到頂部
+                  height={36}  // 設定圖例高度
+                />
                 <Line 
                   type="monotone" 
                   dataKey="RHP" 
