@@ -19,6 +19,16 @@ const PriceComparisonChart = () => {
   const [sortField, setSortField] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
 
+  // 處理排序
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   const sampleData = [{'county': '新竹市',
     'time': '202207',
     'complex_name': '春福生活大賞',
@@ -2573,7 +2583,8 @@ const PriceComparisonChart = () => {
       ...item,
       time: `${item.time.substring(0, 4)}-${item.time.substring(4, 6)}`,
       RHP: Number(item.RHP),
-      yhat: Number(item.yhat)
+      yhat: Number(item.yhat),
+      error: Math.abs((item.RHP - item.yhat)/item.RHP * 100)
     }));
   
     // 依據排序設定
@@ -2723,22 +2734,60 @@ const PriceComparisonChart = () => {
             <table className="min-w-full">
               <thead>
                 <tr className="bg-gray-100">
-                  <th className="px-4 py-2">時間</th>
-                  <th className="px-4 py-2">縣市</th>
-                  <th className="px-4 py-2">社區</th>
+                  <th 
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSort('time')}
+                  >
+                    時間
+                    {sortField === 'time' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </th>
+                  <th 
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSort('county')}
+                  >
+                    縣市
+                    {sortField === 'county' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </th>
+                  <th 
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSort('complex_name')}
+                  >
+                    社區
+                    {sortField === 'complex_name' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </th>
                   <th 
                     className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSort('RHP')}
                   >
-                    實際房價 {sortField === 'RHP' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    實際房價
+                    {sortField === 'RHP' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
                   </th>
                   <th 
                     className="px-4 py-2 cursor-pointer hover:bg-gray-200"
                     onClick={() => handleSort('yhat')}
                   >
-                    預測房價 {sortField === 'yhat' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    預測房價
+                    {sortField === 'yhat' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
                   </th>
-                  <th className="px-4 py-2">誤差</th>
+                  <th 
+                    className="px-4 py-2 cursor-pointer hover:bg-gray-200"
+                    onClick={() => handleSort('error')}
+                  >
+                    誤差
+                    {sortField === 'error' && (
+                      <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
+                    )}
+                  </th>
                 </tr>
               </thead>
               <tbody>
