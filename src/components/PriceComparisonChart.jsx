@@ -2569,7 +2569,7 @@ const PriceComparisonChart = () => {
     return aggregated;
   }, [selectedCounty, selectedComplex]);
 
-  // 獲取詳細數據 - 用於表格
+  // 獲取篩選後的數據
   const getDetailedData = useMemo(() => {
     let filtered = sampleData;
   
@@ -2580,13 +2580,13 @@ const PriceComparisonChart = () => {
       filtered = filtered.filter(item => item.complex_name === selectedComplex);
     }
   
-    // 格式化時間但保持詳細數據
+    // 格式化時間並計算誤差（保留正負號）
     const formattedData = filtered.map(item => ({
       ...item,
       time: `${item.time.substring(0, 4)}-${item.time.substring(4, 6)}`,
       RHP: Number(item.RHP),
       yhat: Number(item.yhat),
-      error: Math.abs((item.RHP - item.yhat)/item.RHP * 100)
+      error: ((item.RHP - item.yhat)/item.RHP * 100)  // 移除 Math.abs 以保留正負號
     }));
   
     // 依據排序設定
@@ -2596,10 +2596,10 @@ const PriceComparisonChart = () => {
     return _.orderBy(formattedData, ['time', 'county', 'complex_name'], ['asc']);
   }, [selectedCounty, selectedComplex, sortField, sortDirection]);
 
-  // 計算平均誤差率
+  // 計算平均誤差率（使用絕對值）
   const averageError = useMemo(() => {
     const errors = getDetailedData.map(item => 
-      Math.abs((item.RHP - item.yhat)/item.RHP * 100)
+      Math.abs((item.RHP - item.yhat)/item.RHP * 100)  // 這裡保留 Math.abs 因為我們要顯示平均誤差的大小
     );
     return (errors.reduce((a, b) => a + b, 0) / errors.length).toFixed(2);
   }, [getDetailedData]);
@@ -2620,6 +2620,7 @@ const PriceComparisonChart = () => {
     return ['all', ...uniqueComplexes];
   }, [selectedCounty]);
 
+  // 自定義提示框元件
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       const dataPoint = getAggregatedData.find(item => item.time === label);
@@ -2817,8 +2818,9 @@ const PriceComparisonChart = () => {
                     <td className="px-4 py-2">{item.complex_name}</td>
                     <td className="px-4 py-2">{(item.RHP/10000).toFixed(2)}萬</td>
                     <td className="px-4 py-2">{(item.yhat/10000).toFixed(2)}萬</td>
-                    <td className="px-4 py-2">
-                      {((item.RHP - item.yhat)/item.RHP * 100).toFixed(2)}%
+                    <td className={`px-4 py-2 ${item.error > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {/* 根據誤差正負值顯示不同顏色 */}
+                      {item.error.toFixed(2)}%
                     </td>
                   </tr>
                 ))}
